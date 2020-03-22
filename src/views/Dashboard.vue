@@ -57,6 +57,10 @@
                             <span v-if="submitted && errors.has('start_date')" class="invalid-feedback">
                               {{ errors.first('start_date') }}
                             </span>
+
+                            <span v-if="submitted && 'start_date' in errors_messages">
+                                {{errors_messages["start_date"][0]}}
+                            </span>
                         </v-col>
                     </v-row>
 
@@ -90,6 +94,10 @@
                             <span v-if="submitted && errors.has('end_date')" class="invalid-feedback">
                               {{ errors.first('end_date') }}
                             </span>
+
+                            <span v-if="submitted && 'end_date' in errors_messages">
+                                {{errors_messages["end_date"][0]}}
+                            </span>
                         </v-col>
                     </v-row>
 
@@ -108,6 +116,9 @@
                             ></v-text-field>
                             <span v-if="submitted && errors.has('email')" class="invalid-feedback">
                               {{ errors.first('email') }}
+                            </span>
+                            <span v-if="submitted && 'email' in errors_messages">
+                                {{errors_messages["email"][0]}}
                             </span>
                         </v-col>
                     </v-row>
@@ -146,6 +157,19 @@
 
                 </v-tabs-items>
             </div>
+            <v-snackbar
+                    v-model="snackbar"
+                    :multi-line="multi_line"
+            >
+                {{ send_email_return_message }}
+                <v-btn
+                        color="red"
+                        text
+                        @click="snackbar = false"
+                >
+                    Close
+                </v-btn>
+            </v-snackbar>
         </template>
     </v-container>
 </template>
@@ -164,9 +188,9 @@ export default {
         return {
             symbols: [],
             companies_data: [],
-            symbol:"",
-            start_date:"",
-            end_date:"",
+            symbol: "",
+            start_date: "",
+            end_date: "",
             pick_start_time_flag: false,
             modal: false,
             pick_end_time_flag: false,
@@ -175,7 +199,11 @@ export default {
             quotes: [],
             quotes_table_data: [],
             tab: 0,
-            prices_data: []
+            send_email_return_message: "",
+            prices_data: [],
+            snackbar: false,
+            multi_line: true,
+            errors_messages: []
         };
     },
 
@@ -202,7 +230,6 @@ export default {
             this.submitted = true
             this.$validator.validate().then(valid => {
                 if (valid) {
-                    // Successfully validated & update the data.
 
                     this.getHistoricalQuotes();
                     this.sendEmail();
@@ -210,14 +237,13 @@ export default {
             });
         },
 
-        // Date,Open,High,Low,Close,Volume,Ex-Dividend,Split Ratio,Adj. Open,Adj. High,Adj. Low,Adj. Close,Adj. Volume\
         getHistoricalQuotes(){
             axios
                 .get('https://www.quandl.com/api/v3/datasets/WIKI/'+this.symbol+
                     '.csv?order=asc&start_date='+this.start_date+'&end_date='+this.end_date)
                 .then(res => {
+
                     this.quotes = res.data.split('\n');
-                    // console.log(this.quotes);
                     this.quotes.shift()
                     this.quotes.forEach(qoute => {
                         let quote_string_split = qoute.split(',');
@@ -227,7 +253,7 @@ export default {
                             high: quote_string_split[2],
                             low: quote_string_split[3],
                             close: quote_string_split[4],
-                            volume: quote_string_split[5],
+                            volume: quote_string_split[5]
                         })
                     })
                 })
@@ -251,7 +277,6 @@ export default {
                 return company.Symbol == that.symbol
             })[0];
 
-            console.log(selected_company["Company Name"])
             let form = {
                 symbol: this.symbol,
                 company_name: selected_company["Company Name"],
@@ -259,9 +284,24 @@ export default {
                 end_date: this.end_date,
                 email: this.email
             }
-            axios.post('http://task.test/api/send-quote-email',form).then(res => {
-                console.log(res)
-            })
+            axios
+                .post('http://task.test/api/send-quote-email',form)
+                .then(res => {
+                    if (res.status == "200")
+                    {
+                        this.snackbar = true;
+                        this.send_email_return_message = "email has been sent successfully!"
+                    }
+                    else {
+                        this.snackbar = true;
+                        this.send_email_return_message = "error!"
+                    }
+                })
+                .catch(error => {
+                    if (error.response) {
+                        this.errors_messages = error.response.data.errors;
+                    }
+                })
         }
     }
 };
