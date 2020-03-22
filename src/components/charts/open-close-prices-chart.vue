@@ -1,16 +1,11 @@
-<!--<template>-->
-<!--    <v-container fluid>-->
-<!--        <div class="small">-->
-            <line-chart :chartdata="chartData" :options="chartOptions" />
-<!--        </div>-->
-<!--    </v-container>-->
-<!--</template>-->
+
+<line-chart :chartdata="chartData" :options="chartOptions" />
+
 
 <script>
-// import VueCharts from 'vue-chartjs'
 import { Line } from "vue-chartjs";
 export default {
-    name: "progresss",
+    name: "open-close-prices-chart",
     extends: Line,
     components: {
         "line-chart": Line
@@ -45,31 +40,20 @@ export default {
             maintainAspectRatio: false
         }
     }),
+    
     created() {
-        // console.log("props", this.labels_prop);
         let that = this;
         this.quotes_prop.forEach(quote => {
-            // console.log(quote)
             that.chartData.labels.push(quote["date"]);
         });
 
         this.quotes_prop.forEach(quote => {
-            // console.log(quote)
             that.chartData.datasets[0].data.push(quote["open"]);
         });
 
         this.quotes_prop.forEach(quote => {
-            // console.log(quote)
             that.chartData.datasets[1].data.push(quote["close"]);
         });
-
-        // this.labels_prop.forEach(label => {
-        //     that.chartData.datasets[0].data.push(1);
-        // });
-        // this.labels_prop.forEach(label => {
-        //     that.chartData.datasets[1].data.push(5);
-        // });
-        // this.labels_prop = ["2017-11-02"];
 
     },
 
@@ -82,17 +66,14 @@ export default {
             handler() {
                 let that = this;
                 this.quotes_prop.forEach(quote => {
-                    console.log(quote)
                     that.chartData.labels.push(quote["date"]);
                 });
 
                 this.quotes_prop.forEach(quote => {
-                    // console.log(quote)
                     that.chartData.datasets[0].data.push(quote["open"]);
                 });
 
                 this.quotes_prop.forEach(quote => {
-                    // console.log(quote)
                     that.chartData.datasets[1].data.push(quote["close"]);
                 });
 

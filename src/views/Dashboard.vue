@@ -54,10 +54,13 @@
                                     </template>
                                     <v-date-picker v-model="start_date" @input="pick_start_time_flag = true"></v-date-picker>
                                 </v-menu>
+
+                            <!--   front side validation messages                         -->
                             <span v-if="submitted && errors.has('start_date')" class="invalid-feedback">
                               {{ errors.first('start_date') }}
                             </span>
 
+                            <!--   server side validation messages                         -->
                             <span v-if="submitted && 'start_date' in errors_messages">
                                 {{errors_messages["start_date"][0]}}
                             </span>
@@ -91,10 +94,12 @@
                                     </template>
                                     <v-date-picker v-model="end_date" @input="pick_end_time_flag = true"></v-date-picker>
                                 </v-menu>
+                            <!--   front side validation messages                         -->
                             <span v-if="submitted && errors.has('end_date')" class="invalid-feedback">
                               {{ errors.first('end_date') }}
                             </span>
 
+                            <!--   server side validation messages                         -->
                             <span v-if="submitted && 'end_date' in errors_messages">
                                 {{errors_messages["end_date"][0]}}
                             </span>
@@ -114,9 +119,13 @@
                                     name="email"
                                     v-validate="'required|email'"
                             ></v-text-field>
+                            <!--   front side validation messages                         -->
+
                             <span v-if="submitted && errors.has('email')" class="invalid-feedback">
                               {{ errors.first('email') }}
                             </span>
+
+                            <!--   server side validation messages                         -->
                             <span v-if="submitted && 'email' in errors_messages">
                                 {{errors_messages["email"][0]}}
                             </span>

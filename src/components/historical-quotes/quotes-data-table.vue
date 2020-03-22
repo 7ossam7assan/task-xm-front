@@ -50,14 +50,9 @@ export default {
        this.items = this.quotes;
     },
 
-    methods: {
-
-    },
-
     watch:{
         quotes(q){
             this.items = q
-            console.log(q);
         }
     }
 };
